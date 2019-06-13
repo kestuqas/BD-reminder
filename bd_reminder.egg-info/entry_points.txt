@@ -1,0 +1,4 @@
+
+		[console_scripts]
+		reminder=reminder:validate_send
+	

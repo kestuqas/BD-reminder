@@ -1,0 +1,7 @@
+setup.py
+bd_reminder.egg-info/PKG-INFO
+bd_reminder.egg-info/SOURCES.txt
+bd_reminder.egg-info/dependency_links.txt
+bd_reminder.egg-info/entry_points.txt
+bd_reminder.egg-info/requires.txt
+bd_reminder.egg-info/top_level.txt
