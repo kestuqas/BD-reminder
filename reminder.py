@@ -1,11 +1,16 @@
 import click
 from datetime import datetime, date, timedelta
 
-@click.command(help="This is a birtday reminder app.\n\
-	This app checks if your data file is correct and throws an error message in case it finds some.\n\
-	Your data file should be a CSV file with 'name','e-mail address','birthdate' format.\n\
-	Birthdays should be in the YY-MM-DD or MM-DD format.\n\
-	The reminders will be sent to all e-mail addresses in the data file except those, which birthday is in 7 days.")
+@click.command(help='This is a birtday reminder app, sending e-mail messages to recipients through Gmail server.\n\
+\nAt the beginning, after typing "reminder" command in Cotrol Line Interface,\
+you should use option "--data_file" after which you should indicate the path to your data file.\
+The app checks then if your data file is correct and throws error messages in case it finds some.\n\
+\nYour data file should be a CSV file with "name surname(optional),e-mail address,birthdate" format.\
+Birthdays should be in the YY-MM-DD or MM-DD format.\n\
+\nIf you\'re happy with your data file, after option "--data_file" you may try option "--send_reminders",\
+after which you should type "True".\n\
+\nBut first set-up your e-mail address and password in the "Settings.txt" file.\n\
+\nThe reminders will be sent to all e-mail addresses in the data file except those, which birthday is in 7 days.')
 
 @click.option('--data_file',
 			  help="Use this option to set the data file path.")
@@ -71,6 +76,3 @@ birthday on {}'.format(item[0], data[happy][0], data[happy][2]))
 					server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 					server.send_message(msg)
 					server.quit()
-
-# validate_send(data_file, True)
-

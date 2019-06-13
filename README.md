@@ -1,7 +1,7 @@
 This is a birtday reminder app, sending e-mail messages to recipients through Gmail server.
 
 At the beginning, after typing "reminder" command in Cotrol Line Interface,
-you should use option "--data_file" after which you should indicate the path to you data file.
+you should use option "--data_file" after which you should indicate the path to your data file.
 The app checks then if your data file is correct and throws error messages in case it finds some.
 
 Your data file should be a CSV file with 'name surname(optional),e-mail address,birthdate" format.
