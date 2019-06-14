@@ -1,26 +1,15 @@
 import click
 from datetime import datetime, date, timedelta
+from settings import *
+from extras import *
 
-@click.command(help='This is a birtday reminder app, sending e-mail messages to recipients through Gmail server.\n\
-\nAt the beginning, after typing "reminder" command in Cotrol Line Interface,\
-you should use option "--data_file" after which you should indicate the path to your data file.\
-The app checks then if your data file is correct and throws error messages in case it finds some.\n\
-\nYour data file should be a CSV file with "name surname(optional),e-mail address,birthdate" format.\
-Birthdays should be in the YY-MM-DD or MM-DD format.\n\
-\nIf you\'re happy with your data file, after option "--data_file" you may try option "--send_reminders",\
-after which you should type "True".\n\
-\nBut first set-up your e-mail address and password in the "Settings.txt" file.\n\
-\nThe reminders will be sent to all e-mail addresses in the data file except those, which birthday is in 7 days.')
 
-@click.option('--data_file',
-			  help="Use this option to set the data file path.")
-
-@click.option('--send_reminders', default=False,
-			  help="Use this option and type 'True' to send reminders.")
-
+@click.command(help=COMMAND_HELP)
+@click.option('--data_file', help=OPTION_DATA)
+@click.option('--send_reminders', help=OPTION_SEND)
 def validate_send(data_file, send_reminders=False):
 
-	target_date = date.today() + timedelta(days=7) # Set reminder days before birthday
+	target_date = date.today() + timedelta(days=reminder_days) # Set reminder days before birthday
 	bd_people= [] # List of "Birthday" people
 	skip_lines = [] # List of incorrect data lines
 
@@ -52,27 +41,31 @@ def validate_send(data_file, send_reminders=False):
 				if b_date.month == target_date.month and b_date.day == target_date.day:
 					bd_people.append(index)
 
-	# Generate reminder e-mails
-	if send_reminders:
+	if send_reminders: # Generate reminder e-mails
 
 		import smtplib
 		from email.message import EmailMessage
-		from emails.template import JinjaTemplate as T
-
-		EMAIL_ADDRESS = 'k.reimeris@gmail.com'
-		EMAIL_PASSWORD = 'uacq zmfg snrs syys'
-
-		for happy in bd_people:
-			for index, item in enumerate(data):
-				if index not in skip_lines and index not in bd_people:
-					msg = EmailMessage()
-					msg['From'] = EMAIL_ADDRESS
-					msg['To'] = '{}'.format(item[1])
-					msg['Subject'] = "Birthday Reminder: {}'s birthday on {}".format(data[happy][0], data[happy][2])
-					msg.set_content('Hi {},\n\nThis is a reminder that {} will be celebrating their\n\
-birthday on {}'.format(item[0], data[happy][0], data[happy][2]))
-
-					server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-					server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-					server.send_message(msg)
-					server.quit()
+		import emails
+		
+		for happy in bd_people: # Iterate through birthday people
+			for index, item in enumerate(data): # Iterate through whole list...
+				if index not in skip_lines and index not in bd_people: # ... but skipping incorrect and "Birtday" ones
+					
+					msg = emails.Message(
+						text=("Hi {},\n\nThis is a reminder that {} will be celebrating their\n\
+birthday on {}.\n\nBe prepared :)\n{}".format(item[0], data[happy][0], data[happy][2], SENDER)),
+						subject=("Birthday Reminder: {}'s birthday on {}".format(data[happy][0], data[happy][2])),
+						mail_from=(SENDER, EMAIL_ADDRESS))
+					
+					# Logic to make few trials (initially 3) if not sent
+					failed = 0
+					while failed < 3:
+						response = msg.send(
+							to=(item[0], '{}'.format(item[1])),
+							smtp=SMTP)
+						if response.status_code not in [250]:
+							if failed == 2: # Failed to send 3 times
+								print("Reminder to {} was not sent".format(item[0])) 
+							failed += 1
+						else:
+							failed = 3

@@ -7,7 +7,8 @@ setup(
 	install_requires=[
 		'Click',
 		'Datetime',
-		'emails'
+		'emails',
+		'config'
 	],
 	entry_points='''
 		[console_scripts]
